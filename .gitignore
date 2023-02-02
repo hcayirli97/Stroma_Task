@@ -1,4 +1,6 @@
 *.jpg
 *.mp4
 *.txt
+*.pyc
 yolov5
+ByteTrack

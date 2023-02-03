@@ -20,16 +20,17 @@ def Track(opt):
     model_path = opt.weights
     device = torch.device(opt.device)
     data_path = opt.data_path
-    
+
     conf_thres, iou_thres = opt.conf_thres, opt.iou_thres
     img_size = [640, 640]
 
 
-    model, tracker= YOLO(model_path, device, data_path, img_size)
+    model, tracker = YOLO(model_path, device, data_path, img_size)
 
     video_capture = cv2.VideoCapture(input_video_path)
-
+    frame_counter, total_time = 0, 0
     while True:
+
         ret, frame = video_capture.read()
         if ret:
             start = time.time()
@@ -47,7 +48,7 @@ def Track(opt):
                     det[:, :4] = scale_boxes(im.shape[2:], det[:, :4], frame.shape).round()
 
                     for *xyxy, conf, cls in reversed(det):
-                        c = int(cls) 
+                        c = int(cls)
                         x1 , y1 , x2 , y2 = xyxy
                         x1 , y1 , x2 , y2 = int(x1), int(y1), int(x2), int(y2)
                         bboxes.append([x1 , y1 , x2 , y2, float(conf)])
@@ -57,34 +58,39 @@ def Track(opt):
                 input_track = torch.tensor(bboxes, dtype=torch.float32)
                 tracklets = tracker.update(input_track, img_size, img_size)
             except:
-                input_track = torch.empty(1,6)
+                input_track = torch.zeros(1,5)
                 tracklets = tracker.update(input_track , img_size , img_size)
 
             out_boxes = match_boxes(bboxes, tracklets, classes)
 
             for box in out_boxes:
                 x1 ,y1,x2, y2 = box[0][:4]
+                conf =  box[0][4]
                 c = box[1]
                 track_id = box[2]
                 if c == 0:
                     cv2.rectangle(frame,(x1,y1),(x2,y2),(98,195,112),1)
-                    cv2.putText(frame,"Bolt "+str(track_id),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
-                    cv2.putText(frame,"Bolt "+str(track_id),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Bolt {:.2f}".format(track_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Bolt {:.2f}".format(track_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
                 else:
                     cv2.rectangle(frame,(x1,y1),(x2,y2),(204,51,99),1)
-                    cv2.putText(frame,"Nut "+str(track_id),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
-                    cv2.putText(frame,"Nut "+str(track_id),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
-            
+                    cv2.putText(frame,"{} Nut {:.2f}".format(track_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Nut {:.2f}".format(track_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
+
             inference_time = time.time() - start
+            total_time += inference_time
+            frame_counter += 1
             cv2.putText(frame, 'FPS: {:.2f}'.format(1/inference_time), (25,25), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 
+                        cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255,255,255), 2, cv2.LINE_AA)
             cv2.imshow("frame",frame)
             k = cv2.waitKey(1) & 0xFF
             if k == 27:
+                print("Avg FPS: {:.2f}".format(1/(total_time/frame_counter)))
                 cv2.destroyAllWindows()
                 break
         else:
+            print("Avg FPS: {:.2f}".format(1/(total_time/frame_counter)))
             cv2.destroyAllWindows()
             break
 
@@ -92,7 +98,7 @@ def Track(opt):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', type=str, default='trained_model/best.pt', help='initial weights path')
+    parser.add_argument('--weights', type=str, default='trained_models\yolov5n_best.pt', help='initial weights path')
     parser.add_argument('--data_path', type=str, default='yolov5/data/coco128.yaml', help='model data path')
     parser.add_argument('--device', type=str, default='cuda', help='cuda or cpu')
     parser.add_argument('--conf_thres', type=float, default= 0.7, help='confidence threshold')
@@ -101,4 +107,3 @@ if __name__ == '__main__':
     opt = parser.parse_args()
 
     Track(opt)
-

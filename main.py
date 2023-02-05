@@ -102,13 +102,13 @@ def Track(opt):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', type=str, default='trained_models\yolov5n_best.pt', help='initial weights path')
-    parser.add_argument('--data_path', type=str, default='yolov5/data/coco128.yaml', help='model data path')
+    parser.add_argument('--weights', type=str, default='trained_models/yolov5n_best.pt', help='initial weights path')
+    parser.add_argument('--data_path', type=str, default='trained_models/coco128.yaml', help='model data path')
     parser.add_argument('--device', type=str, default='cuda', help='cuda or cpu')
     parser.add_argument('--save_path', type=str, default='', help='save path')
     parser.add_argument('--conf_thres', type=float, default= 0.7, help='confidence threshold')
     parser.add_argument('--iou_thres', type=float, default= 0.45, help='iou threshold')
-    parser.add_argument('--video_input_path', type=str, default='challenge/images/test/test.mp4', help='video path')
+    parser.add_argument('--video_input_path', type=str, default='input_video/test.mp4', help='video path')
     opt = parser.parse_args()
 
     Track(opt)

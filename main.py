@@ -10,7 +10,7 @@ sys.path.append("ByteTrack/")
 
 import numpy as np
 
-from get_models import YOLO
+from get_models import GET_MODELS
 from utils_fonks import match_boxes, preprocess
 from yolov5.utils.general import non_max_suppression, scale_boxes
 
@@ -24,8 +24,14 @@ def Track(opt):
     conf_thres, iou_thres = opt.conf_thres, opt.iou_thres
     img_size = [640, 640]
 
+    model, tracker = GET_MODELS(model_path, device, data_path, img_size)
 
-    model, tracker = YOLO(model_path, device, data_path, img_size)
+    if model_path.split(".")[-1] == "onnx": model_format = "ONNX"
+    elif model_path.split(".")[-1] == "engine":  model_format = "TensorRT"
+    else: model_format = "PyTorch"
+
+    fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+    video_writer = cv2.VideoWriter(opt.save_path + model_format + "_result.mp4", fourcc, 30, (640,640), True)
 
     video_capture = cv2.VideoCapture(input_video_path)
     frame_counter, total_time = 0, 0
@@ -83,15 +89,13 @@ def Track(opt):
             cv2.putText(frame, 'FPS: {:.2f}'.format(1/inference_time), (25,25), 
                         cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255,255,255), 2, cv2.LINE_AA)
-            cv2.imshow("frame",frame)
-            k = cv2.waitKey(1) & 0xFF
-            if k == 27:
-                print("Avg FPS: {:.2f}".format(1/(total_time/frame_counter)))
-                cv2.destroyAllWindows()
-                break
+            cv2.putText(frame, model_format, (475,25), 
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1, (255,255,255), 2, cv2.LINE_AA)
+            video_writer.write(frame)
         else:
             print("Avg FPS: {:.2f}".format(1/(total_time/frame_counter)))
-            cv2.destroyAllWindows()
+            video_writer.release()
             break
 
 
@@ -101,6 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('--weights', type=str, default='trained_models\yolov5n_best.pt', help='initial weights path')
     parser.add_argument('--data_path', type=str, default='yolov5/data/coco128.yaml', help='model data path')
     parser.add_argument('--device', type=str, default='cuda', help='cuda or cpu')
+    parser.add_argument('--save_path', type=str, default='', help='save path')
     parser.add_argument('--conf_thres', type=float, default= 0.7, help='confidence threshold')
     parser.add_argument('--iou_thres', type=float, default= 0.45, help='iou threshold')
     parser.add_argument('--video_input_path', type=str, default='challenge/images/test/test.mp4', help='video path')

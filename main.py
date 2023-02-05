@@ -95,6 +95,7 @@ def Track(opt):
             video_writer.write(frame)
         else:
             print("Avg FPS: {:.2f}".format(1/(total_time/frame_counter)))
+            print("Output video path: " + opt.save_path + model_format + "_result.mp4")
             video_writer.release()
             break
 

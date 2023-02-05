@@ -4,6 +4,7 @@
 *.txt
 *.pyc
 yolov5
+challenge\annotations
 ByteTrack
 .idea
 !challenge/images/test/test.mp4

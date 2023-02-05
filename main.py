@@ -30,7 +30,7 @@ def Track(opt):
     elif model_path.split(".")[-1] == "engine":  model_format = "TensorRT"
     else: model_format = "PyTorch"
 
-    fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     video_writer = cv2.VideoWriter(opt.save_path + model_format + "_result.mp4", fourcc, 30, (640,640), True)
 
     video_capture = cv2.VideoCapture(input_video_path)

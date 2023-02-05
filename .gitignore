@@ -4,9 +4,7 @@
 *.txt
 *.pyc
 yolov5
-challenge\annotations\instances_test.json
-challenge\annotations\instances_val.json
-challenge\annotations\instances_train.json
+challenge
 ByteTrack
 .idea
-!challenge/images/test/test.mp4
+!input_video/test.mp4

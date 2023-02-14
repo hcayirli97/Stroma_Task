@@ -35,7 +35,7 @@ def Track(opt):
 
     video_capture = cv2.VideoCapture(input_video_path)
     frame_counter, total_time = 0, 0
-    Objs_ids = []
+    Objs_ids = {"Bolt":[] , "Nut": []}
     while True:
 
         ret, frame = video_capture.read()
@@ -75,21 +75,21 @@ def Track(opt):
                 conf =  box[0][4]
                 c = box[1]
                 track_id = box[2]
-                
-                if track_id in Objs_ids:
-                    count_id = Objs_ids.index(track_id) + 1
-                else:
-                    Objs_ids.append(track_id)
-                    count_id = Objs_ids.index(track_id) + 1
-
+                if (y1 + y2)/1 > frame.shape[0]:
+                    if c == 0:
+                        if track_id not in Objs_ids['Bolt']:       
+                            Objs_ids['Bolt'].append(track_id)
+                    else:
+                        if track_id not in Objs_ids['Nut']:       
+                            Objs_ids['Nut'].append(track_id)
                 if c == 0:
                     cv2.rectangle(frame,(x1,y1),(x2,y2),(98,195,112),1)
-                    cv2.putText(frame,"{} Bolt {:.2f}".format(count_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
-                    cv2.putText(frame,"{} Bolt {:.2f}".format(count_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Bolt {:.2f}".format(track_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Bolt {:.2f}".format(track_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
                 else:
                     cv2.rectangle(frame,(x1,y1),(x2,y2),(204,51,99),1)
-                    cv2.putText(frame,"{} Nut {:.2f}".format(count_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
-                    cv2.putText(frame,"{} Nut {:.2f}".format(count_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Nut {:.2f}".format(track_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Nut {:.2f}".format(track_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
 
             inference_time = time.time() - start
             total_time += inference_time
@@ -97,6 +97,15 @@ def Track(opt):
             cv2.putText(frame, 'FPS: {:.2f}'.format(1/inference_time), (25,25), 
                         cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255,255,255), 2, cv2.LINE_AA)
+
+            cv2.putText(frame, 'Bolt: {} Nut: {}'.format(len(Objs_ids['Bolt']),len(Objs_ids['Nut'])), (25,600), 
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1, (0,0,0), 6, cv2.LINE_AA)
+
+            cv2.putText(frame, 'Bolt: {} Nut: {}'.format(len(Objs_ids['Bolt']),len(Objs_ids['Nut'])), (25,600), 
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1, (255,255,255), 2, cv2.LINE_AA)
+
             cv2.putText(frame, model_format, (475,25), 
                         cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255,255,255), 2, cv2.LINE_AA)
@@ -117,7 +126,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_path', type=str, default='', help='save path')
     parser.add_argument('--conf_thres', type=float, default= 0.7, help='confidence threshold')
     parser.add_argument('--iou_thres', type=float, default= 0.45, help='iou threshold')
-    parser.add_argument('--video_input_path', type=str, default='input_video/test.mp4', help='video path')
+    parser.add_argument('--video_input_path', type=str, default='input_video/test_final.mp4', help='video path')
     opt = parser.parse_args()
 
     Track(opt)

@@ -27,6 +27,6 @@ python main.py --weights "trained_models/yolov5n_best.engine" \
    
  ## Result
  
- After giving **test.mp4** video as input, model output was recorded as video. In the below, there is a short video clip from the video output.
+ After giving **test.mp4** video as input, model output was recorded as video. In the below, there is a video frame from the video output.
  
- ![Result](https://github.com/hcayirli97/Stroma_Task/blob/main/imgs/Result.gif)
+ ![Result](https://github.com/hcayirli97/Stroma_Task/blob/main/imgs/result.png)

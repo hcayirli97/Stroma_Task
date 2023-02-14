@@ -35,6 +35,7 @@ def Track(opt):
 
     video_capture = cv2.VideoCapture(input_video_path)
     frame_counter, total_time = 0, 0
+    Objs_ids = []
     while True:
 
         ret, frame = video_capture.read()
@@ -74,14 +75,21 @@ def Track(opt):
                 conf =  box[0][4]
                 c = box[1]
                 track_id = box[2]
+                
+                if track_id in Objs_ids:
+                    count_id = Objs_ids.index(track_id) + 1
+                else:
+                    Objs_ids.append(track_id)
+                    count_id = Objs_ids.index(track_id) + 1
+
                 if c == 0:
                     cv2.rectangle(frame,(x1,y1),(x2,y2),(98,195,112),1)
-                    cv2.putText(frame,"{} Bolt {:.2f}".format(track_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
-                    cv2.putText(frame,"{} Bolt {:.2f}".format(track_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Bolt {:.2f}".format(count_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Bolt {:.2f}".format(count_id,conf),(x1,y1-  10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
                 else:
                     cv2.rectangle(frame,(x1,y1),(x2,y2),(204,51,99),1)
-                    cv2.putText(frame,"{} Nut {:.2f}".format(track_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
-                    cv2.putText(frame,"{} Nut {:.2f}".format(track_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Nut {:.2f}".format(count_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,0),4,cv2.LINE_AA)
+                    cv2.putText(frame,"{} Nut {:.2f}".format(count_id,conf),(x1,y1 - 10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
 
             inference_time = time.time() - start
             total_time += inference_time

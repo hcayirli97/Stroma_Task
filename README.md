@@ -12,7 +12,7 @@ First of all, the videos in the dataset were extracted with their annotations an
 ![PR](https://github.com/hcayirli97/Stroma_Task/blob/main/imgs/PR_curve.png)
 ![CM](https://github.com/hcayirli97/Stroma_Task/blob/main/imgs/confusion_matrix.png)
 
-The resulting Pytorch model is exported as onnx and tensorrt and is located in the input video path [trained_models](https://github.com/hcayirli97/Stroma_Task/tree/main/trained_models) folder.
+The resulting Pytorch model is exported as onnx and tensorrt and is located in the [trained_models](https://github.com/hcayirli97/Stroma_Task/tree/main/trained_models) folder.
 
 ## Detection and Tracking Pipeline
 
